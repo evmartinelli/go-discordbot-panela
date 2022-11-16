@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"golang.org/x/net/html/charset"
 )
 
 // Repository interface
@@ -94,7 +96,6 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	gclubsess := "gclubsess=" + os.Getenv("GCLUB_SESS")
 
 	req.Header.Add("Cookie", gclubsess)
-	req.Header.Add("Content-Type", "application/json; charset=UTF-8")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -107,7 +108,13 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 
 	if resp.StatusCode == 200 {
 		defer resp.Body.Close()
-		body, err := io.ReadAll(resp.Body)
+		reader, err := charset.NewReader(resp.Body, "application/json; charset=UTF-8")
+		if err != nil {
+			log.Println("Error at NewReader: \nMsg: ", err)
+			return err
+		}
+
+		body, err := io.ReadAll(reader)
 		if err != nil {
 			log.Println("Error at ReadBody: \nMsg: ", err)
 			return err
