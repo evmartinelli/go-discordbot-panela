@@ -102,5 +102,7 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 		return fmt.Errorf("TranslationWebAPI - Translate - trans.Translate: %w", err)
 	}
 
+	log.Println(resp.Result())
+
 	return nil
 }
