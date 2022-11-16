@@ -90,7 +90,7 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	gclubsess := "gclubsess=" + os.Getenv("GCLUB_SESS")
 
 	resp, err := client.R().
-		SetResult(&data).
+		SetResult(data).
 		SetPathParams(map[string]string{"playerID": playerID}).
 		SetHeader("Cookie", gclubsess).
 		Get("https://gamersclub.com.br/api/box/historyFilterDate/{playerID}/2022-11")
