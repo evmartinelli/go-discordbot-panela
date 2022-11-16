@@ -65,7 +65,7 @@ func (messageRepository) GetBadWordList() (ReplyWordStruct, error) {
 // GetPlayersURL return list of players
 func (messageRepository) GetPlayersURL() (Players, error) {
 	// need to injection config
-	playersFile, err := os.Open("/Users/evandrom/Projects/Personal/go-discordbot-panela/data/panela.json")
+	playersFile, err := os.Open("./data/panela.json")
 	if err != nil {
 		fmt.Println("Error at HandleService: opening messages.json,\nMsg: ", err)
 		return Players{}, err
