@@ -1,1 +1,1 @@
-worker: bin/app
+worker: make run
