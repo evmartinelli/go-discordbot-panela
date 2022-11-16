@@ -84,7 +84,9 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 		fmt.Println("Error at HandleService: calling GCs API")
 	}
 
-	req.Header.Add("Cookie", "gclubsess=6e3c2dc70e5393dfea9dc3ffec70d13e869de3b0")
+	gclubsess := "gclubsess=" + os.Getenv("GCLUB_SESS")
+
+	req.Header.Add("Cookie", gclubsess)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
