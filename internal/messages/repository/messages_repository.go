@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 
-	"golang.org/x/net/html/charset"
+	"github.com/go-resty/resty/v2"
 )
 
 // Repository interface
@@ -86,46 +85,21 @@ func (messageRepository) GetPlayersURL() (Players, error) {
 }
 
 func (messageRepository) GetPlayersStats(playerID string, data *Response) error {
-	urlAPI := fmt.Sprintf("https://gamersclub.com.br/api/box/historyFilterDate/%s/2022-11", playerID)
-	req, err := http.NewRequest(http.MethodGet, urlAPI, nil)
-	if err != nil {
-		log.Println("Error at NewRequest: \nMsg: ", err)
-		return err
-	}
+	client := resty.New()
 
 	gclubsess := "gclubsess=" + os.Getenv("GCLUB_SESS")
 
-	req.Header.Add("Cookie", gclubsess)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := client.R().
+		SetResult(&data).
+		SetPathParams(map[string]string{"playerID": playerID}).
+		SetHeader("Cookie", gclubsess).
+		Get("https://gamersclub.com.br/api/box/historyFilterDate/{playerID}/2022-11")
 	if err != nil {
-		log.Println("Error at Do: \nMsg: ", err)
-		return err
+		return fmt.Errorf("TranslationWebAPI - Translate - trans.Translate: %w", err)
 	}
 
-	log.Println("Get Body for playerID: ", playerID)
-
-	if resp.StatusCode == 200 {
-		defer resp.Body.Close()
-		reader, err := charset.NewReader(resp.Body, "application/json; charset=UTF-8")
-		if err != nil {
-			log.Println("Error at NewReader: \nMsg: ", err)
-			return err
-		}
-
-		body, err := io.ReadAll(reader)
-		if err != nil {
-			log.Println("Error at ReadBody: \nMsg: ", err)
-			return err
-		}
-
-		if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
-			log.Println("Error at Unmarshall: \nMsg: ", err)
-			return err
-		}
-	} else {
-		log.Println("StatusCode: ", resp.StatusCode)
+	if resp.IsError() {
+		return fmt.Errorf("TranslationWebAPI - Translate - trans.Translate: %w", err)
 	}
 
 	return nil

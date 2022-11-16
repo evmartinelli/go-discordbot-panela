@@ -17,6 +17,7 @@ require (
 )
 
 require (
+	github.com/go-resty/resty/v2 v2.7.0
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/joho/godotenv v1.4.0
 	go.uber.org/fx v1.18.2
