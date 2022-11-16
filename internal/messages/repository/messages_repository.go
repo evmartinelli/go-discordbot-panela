@@ -3,7 +3,7 @@ package repository
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -57,7 +57,7 @@ func (messageRepository) GetBadWordList() (ReplyWordStruct, error) {
 		return ReplyWordStruct{}, err
 	}
 	defer messagesFile.Close()
-	replyWordByteValue, _ := ioutil.ReadAll(messagesFile)
+	replyWordByteValue, _ := io.ReadAll(messagesFile)
 	var replyWord ReplyWordStruct
 	json.Unmarshal(replyWordByteValue, &replyWord)
 	return replyWord, nil
@@ -73,7 +73,7 @@ func (messageRepository) GetPlayersURL() (Players, error) {
 	}
 
 	defer playersFile.Close()
-	playersByteValue, _ := ioutil.ReadAll(playersFile)
+	playersByteValue, _ := io.ReadAll(playersFile)
 	if err != nil {
 		log.Println("Error at ReadAll Players: \nMsg: ", err)
 		return Players{}, err
@@ -106,7 +106,7 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 
 	if resp.StatusCode == 200 {
 		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			log.Println("Error at ReadBody: \nMsg: ", err)
 			return err
