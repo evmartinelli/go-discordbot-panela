@@ -39,15 +39,7 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 		return
 	}
 
-	if strings.Contains(m.Content, "first kill") {
-		md.discord.SendMessageToChannel(m.ChannelID, md.messagesUsecase.GetRandomKuyReplyWord())
-	} else if strings.Contains(m.Content, "kakule") {
-		content, err := md.messagesUsecase.GetPanelaKAST()
-		if err != nil {
-			log.Println(err)
-		}
-		md.discord.SendMessageToChannel(m.ChannelID, content)
-	} else if strings.Contains(m.Content, "reeday") {
+	if strings.Contains(m.Content, "reeday") {
 		content, err := md.messagesUsecase.GetPanelaMatches()
 		if err != nil {
 			log.Println(err)
