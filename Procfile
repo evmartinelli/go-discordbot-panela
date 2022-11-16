@@ -1,1 +1,1 @@
-worker: csgo-panela-bot
+worker: bin/app
