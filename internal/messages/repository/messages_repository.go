@@ -106,6 +106,7 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	}
 
 	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
+		log.Println("Error at Unmarshall: \nMsg: ", body)
 		log.Println("Error at Unmarshall: \nMsg: ", err)
 		return err
 	}
