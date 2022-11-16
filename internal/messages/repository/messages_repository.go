@@ -81,7 +81,7 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	urlAPI := fmt.Sprintf("https://gamersclub.com.br/api/box/historyFilterDate/%s/2022-11", playerID)
 	req, err := http.NewRequest(http.MethodGet, urlAPI, nil)
 	if err != nil {
-		fmt.Println("Error at HandleService: calling GCs API")
+		return err
 	}
 
 	gclubsess := "gclubsess=" + os.Getenv("GCLUB_SESS")

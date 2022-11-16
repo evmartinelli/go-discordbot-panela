@@ -1,0 +1,1 @@
+worker: csgo-panela-bot
