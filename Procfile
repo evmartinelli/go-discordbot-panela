@@ -1,1 +1,1 @@
-worker: bin/app
+worker: go run ./cmd/app/
