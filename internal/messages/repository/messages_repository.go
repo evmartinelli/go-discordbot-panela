@@ -94,7 +94,7 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	gclubsess := "gclubsess=" + os.Getenv("GCLUB_SESS")
 
 	req.Header.Add("Cookie", gclubsess)
-	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Content-Type", "application/json; charset=UTF-8")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
