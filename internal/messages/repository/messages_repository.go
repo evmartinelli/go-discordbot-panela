@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 )
@@ -67,7 +68,7 @@ func (messageRepository) GetPlayersURL() (Players, error) {
 	// need to injection config
 	playersFile, err := os.Open("./data/panela.json")
 	if err != nil {
-		fmt.Println("Error at HandleService: opening messages.json,\nMsg: ", err)
+		log.Println("Error at HandleService: opening messages.json,\nMsg: ", err)
 		return Players{}, err
 	}
 	defer playersFile.Close()
@@ -81,6 +82,7 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	urlAPI := fmt.Sprintf("https://gamersclub.com.br/api/box/historyFilterDate/%s/2022-11", playerID)
 	req, err := http.NewRequest(http.MethodGet, urlAPI, nil)
 	if err != nil {
+		log.Println("Error at NewRequest: \nMsg: ", err)
 		return err
 	}
 
@@ -91,6 +93,7 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Println("Error at Do: \nMsg: ", err)
 		return err
 	}
 
@@ -98,11 +101,12 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Println("Error at ReadBody: \nMsg: ", err)
 		return err
 	}
 
 	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
-		fmt.Println(err)
+		log.Println("Error at Unmarshall: \nMsg: ", err)
 		return err
 	}
 
