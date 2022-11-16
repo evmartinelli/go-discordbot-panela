@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
 // Repository interface
@@ -72,8 +71,13 @@ func (messageRepository) GetPlayersURL() (Players, error) {
 		log.Println("Error at HandleService: opening messages.json,\nMsg: ", err)
 		return Players{}, err
 	}
+
 	defer playersFile.Close()
 	playersByteValue, _ := ioutil.ReadAll(playersFile)
+	if err != nil {
+		log.Println("Error at ReadAll Players: \nMsg: ", err)
+		return Players{}, err
+	}
 	var players Players
 	json.Unmarshal(playersByteValue, &players)
 	return players, nil
@@ -91,17 +95,15 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 
 	req.Header.Add("Cookie", gclubsess)
 
-	client := &http.Client{
-		Timeout: 50 * time.Second,
-	}
+	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Error at Do: \nMsg: ", err)
 		return err
 	}
 
+	log.Println("Get Body for playerID: ", playerID)
 	defer resp.Body.Close()
-
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("Error at ReadBody: \nMsg: ", err)
