@@ -47,6 +47,10 @@ type Response struct {
 		Loss    int `json:"loss"`
 		Matches int `json:"matches"`
 	} `json:"matches"`
+	Stat []struct {
+		Stat  string `json:"stat"`
+		Value string `json:"value"`
+	} `json:"stat"`
 }
 
 // GetBadWordList return list of bad word
@@ -67,7 +71,8 @@ func (messageRepository) GetBadWordList() (ReplyWordStruct, error) {
 // GetPlayersURL return list of players
 func (messageRepository) GetPlayersURL() (Players, error) {
 	// need to injection config
-	playersFile, err := os.Open("./data/panela.json")
+	// playersFile, err := os.Open("./data/panela.json")
+	playersFile, err := os.Open("/Users/evandrom/Projects/Personal/go-discordbot-panela/data/panela.json")
 	if err != nil {
 		log.Println("Error at HandleService: opening messages.json,\nMsg: ", err)
 		return Players{}, err
@@ -101,8 +106,6 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	if resp.IsError() {
 		return fmt.Errorf("TranslationWebAPI - Translate - trans.Translate: %w", err)
 	}
-
-	log.Println(resp.Result())
 
 	return nil
 }
