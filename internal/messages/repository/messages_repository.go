@@ -99,6 +99,9 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 		SetPathParams(map[string]string{"playerID": playerID}).
 		SetHeader("Cookie", gclubsess).
 		Get("https://gamersclub.com.br/api/box/historyFilterDate/{playerID}/2022-11")
+
+	log.Println(resp.StatusCode())
+
 	if err != nil {
 		return fmt.Errorf("TranslationWebAPI - Translate - trans.Translate: %w", err)
 	}
