@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"log"
 	"os"
 	"strings"
 
@@ -38,9 +39,15 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 		return
 	}
 
-	if strings.Contains(m.Content, "kakule") || strings.Contains(m.Content, "biriba") {
+	if strings.Contains(m.Content, "first kill") {
 		md.discord.SendMessageToChannel(m.ChannelID, md.messagesUsecase.GetRandomKuyReplyWord())
-	} else if strings.Contains(m.Content, "panela") || strings.Contains(m.Content, "csgo") || strings.Contains(m.Content, "teste") {
-		md.discord.SendMessageToChannel(m.ChannelID, md.messagesUsecase.GetRandomReplyWord())
+	} else if strings.Contains(m.Content, "kakule") {
+		md.discord.SendMessageToChannel(m.ChannelID, "100% KAST")
+	} else if strings.Contains(m.Content, "reeday") {
+		content, err := md.messagesUsecase.GetPanelaMatches()
+		if err != nil {
+			log.Println(err)
+		}
+		md.discord.SendMessageToChannel(m.ChannelID, content)
 	}
 }

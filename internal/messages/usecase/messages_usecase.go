@@ -1,7 +1,10 @@
 package usecase
 
 import (
+	"bytes"
+	"fmt"
 	"math/rand"
+	"sort"
 
 	"github.com/evmartinelli/go-discordbot-panela/internal/messages/repository"
 )
@@ -10,6 +13,7 @@ import (
 type Usecase interface {
 	GetRandomKuyReplyWord() string
 	GetRandomReplyWord() string
+	GetPanelaMatches() (string, error)
 }
 
 type messagesUsecase struct {
@@ -41,4 +45,47 @@ func (mu messagesUsecase) GetRandomReplyWord() string {
 	}
 	wordIndex := rand.Intn(len(replyWord.BadwordReply))
 	return replyWord.KuyReply[wordIndex]
+}
+
+// GetPlayersURL return list of players
+func (mu messagesUsecase) GetPanelaMatches() (string, error) {
+	matches := make(map[string]int)
+
+	players, err := mu.messagesRepository.GetPlayersURL()
+	if err != nil {
+		return "", err
+	}
+
+	for _, v := range players.Players {
+		var stats repository.Response
+		err = mu.messagesRepository.GetPlayersStats(v.Url, &stats)
+		if err != nil {
+			return "", err
+		}
+
+		matches[v.Nick] = stats.Matches.Matches
+
+	}
+
+	return createKeyValuePairs(matches), nil
+}
+
+func createKeyValuePairs(m map[string]int) string {
+	keys := make([]string, 0, len(m))
+
+	for key := range m {
+		keys = append(keys, key)
+	}
+
+	sort.Slice(keys, func(i, j int) bool {
+		return m[keys[i]] > m[keys[j]]
+	})
+
+	b := new(bytes.Buffer)
+
+	for _, v := range keys {
+		fmt.Fprintf(b, "%v jogou \"%v\"\n", v, m[v])
+	}
+
+	return b.String()
 }
