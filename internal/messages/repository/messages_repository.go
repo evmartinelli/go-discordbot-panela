@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 // Repository interface
@@ -90,7 +91,9 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 
 	req.Header.Add("Cookie", gclubsess)
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 50 * time.Second,
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Error at Do: \nMsg: ", err)
@@ -106,7 +109,6 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	}
 
 	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
-		log.Println("Error at Unmarshall: \nMsg: ", body)
 		log.Println("Error at Unmarshall: \nMsg: ", err)
 		return err
 	}
