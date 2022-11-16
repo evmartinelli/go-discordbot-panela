@@ -103,16 +103,21 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	}
 
 	log.Println("Get Body for playerID: ", playerID)
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Println("Error at ReadBody: \nMsg: ", err)
-		return err
-	}
 
-	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
-		log.Println("Error at Unmarshall: \nMsg: ", err)
-		return err
+	if resp.StatusCode == 200 {
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Println("Error at ReadBody: \nMsg: ", err)
+			return err
+		}
+
+		if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
+			log.Println("Error at Unmarshall: \nMsg: ", err)
+			return err
+		}
+	} else {
+		log.Println("StatusCode: ", resp.StatusCode)
 	}
 
 	return nil
