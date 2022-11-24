@@ -32,4 +32,14 @@ func TestTestListPostsUseCase(t *testing.T) {
 		}
 		fmt.Println(player)
 	})
+
+	t.Run("Given no post exists, it returns an empty slice", func(t *testing.T) {
+		f := setup()
+
+		player, err := f.usecase.GetPanelaKAST()
+		if err != nil {
+			fmt.Println(player)
+		}
+		fmt.Println(player)
+	})
 }
