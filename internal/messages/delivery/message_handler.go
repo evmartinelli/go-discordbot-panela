@@ -45,5 +45,11 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 			log.Println(err)
 		}
 		md.discord.SendMessageToChannel(m.ChannelID, content)
+	} else if strings.Contains(m.Content, "kakule") {
+		content, err := md.messagesUsecase.GetPanelaKAST()
+		if err != nil {
+			log.Println(err)
+		}
+		md.discord.SendMessageToChannel(m.ChannelID, content)
 	}
 }

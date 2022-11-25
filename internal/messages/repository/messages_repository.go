@@ -53,7 +53,7 @@ type Response struct {
 	} `json:"stat"`
 }
 
-const GCURL = ""
+const GCURL = "https://csgo.gamersclub.gg/api/box/history/{playerID}"
 
 // GetBadWordList return list of bad word
 func (messageRepository) GetBadWordList() (ReplyWordStruct, error) {
@@ -73,8 +73,8 @@ func (messageRepository) GetBadWordList() (ReplyWordStruct, error) {
 // GetPlayersURL return list of players
 func (messageRepository) GetPlayersURL() (Players, error) {
 	// need to injection config
-	// playersFile, err := os.Open("./data/panela.json")
-	playersFile, err := os.Open("/Users/evandrom/Projects/Personal/go-discordbot-panela/data/panela.json")
+	playersFile, err := os.Open("./data/panela.json")
+	// playersFile, err := os.Open("/Users/evandrom/Projects/Personal/go-discordbot-panela/data/panela.json")
 	if err != nil {
 		log.Println("Error at HandleService: opening messages.json,\nMsg: ", err)
 		return Players{}, err
@@ -100,7 +100,7 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 		SetResult(data).
 		SetPathParams(map[string]string{"playerID": playerID}).
 		SetHeader("Cookie", gclubsess).
-		Get("https://gamersclub.com.br/api/box/history/{playerID}")
+		Get(GCURL)
 
 		// Explore response object
 	fmt.Println("Response Info:")

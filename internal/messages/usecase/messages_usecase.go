@@ -3,7 +3,9 @@ package usecase
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"sort"
+	"time"
 
 	"github.com/evmartinelli/go-discordbot-panela/internal/messages/repository"
 	"golang.org/x/exp/constraints"
@@ -28,6 +30,7 @@ func NewMessagesUsecase(mr repository.Repository) Usecase {
 
 // GetPlayersURL return list of players
 func (mu messagesUsecase) GetPanelaMatches() (string, error) {
+	defer timeTrack(time.Now(), "MATCHES")
 	matches := make(map[string]int)
 
 	players, err := mu.messagesRepository.GetPlayersURL()
@@ -50,6 +53,7 @@ func (mu messagesUsecase) GetPanelaMatches() (string, error) {
 }
 
 func (mu messagesUsecase) GetPanelaKAST() (string, error) {
+	defer timeTrack(time.Now(), "KAST")
 	matches := make(map[string]string)
 
 	players, err := mu.messagesRepository.GetPlayersURL()
@@ -96,4 +100,9 @@ func SortKeys[K constraints.Ordered, V constraints.Ordered](m map[K]V) []K {
 	})
 
 	return keys
+}
+
+func timeTrack(start time.Time, name string) {
+	elapsed := time.Since(start)
+	log.Printf("%s took %s", name, elapsed)
 }
