@@ -50,7 +50,7 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 		log.Println(err)
 	}
 
-	if strings.Contains(m.Content, "ควย") || strings.Contains(m.Content, "8;p") {
+	if strings.Contains(m.Content, "kakule malvadao") {
 		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/kakule_malvadao.mp3", s, m, guild, false)
 		md.discord.SendMessageToChannel(m.ChannelID, "é o kakule malvadão ooo")
 	} else if strings.Contains(m.Content, "reeday") {
