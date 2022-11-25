@@ -84,5 +84,9 @@ func connectToVoiceChannel(discord discord.Discord, s *discordgo.Session, m *dis
 		}
 	}
 	voiceConnection, err = s.ChannelVoiceJoin(guild.ID, voiceChannelID, false, false)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
 	return
 }

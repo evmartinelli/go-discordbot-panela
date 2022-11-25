@@ -23,8 +23,9 @@ type messageDelivery struct {
 }
 
 // NewMessageDelivery new message delivery
-func NewMessageDelivery(discord discord.Discord, mu messagesUsecase.Usecase) Delivery {
+func NewMessageDelivery(discord discord.Discord, vu voiceUsecase.Usecase, mu messagesUsecase.Usecase) Delivery {
 	return &messageDelivery{
+		voiceUsecase:    vu,
 		discord:         discord,
 		messagesUsecase: mu,
 	}
@@ -50,7 +51,7 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 		log.Println(err)
 	}
 
-	if strings.Contains(m.Content, "kakule malvadao") {
+	if strings.Contains(m.Content, "malvadao") {
 		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/kakule_malvadao.mp3", s, m, guild, false)
 		md.discord.SendMessageToChannel(m.ChannelID, "é o kakule malvadão ooo")
 	} else if strings.Contains(m.Content, "reeday") {
