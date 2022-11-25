@@ -7,6 +7,7 @@ import (
 	"github.com/evmartinelli/go-discordbot-panela/internal/discord"
 	"github.com/evmartinelli/go-discordbot-panela/internal/logger"
 	messageProvider "github.com/evmartinelli/go-discordbot-panela/internal/messages/provider"
+	voiceProvider "github.com/evmartinelli/go-discordbot-panela/internal/voice/provider"
 
 	"github.com/evmartinelli/go-discordbot-panela/internal/routes"
 	"github.com/joho/godotenv"
@@ -50,6 +51,7 @@ func RunServer() error {
 		messageProvider.RepositoryModule,
 		messageProvider.UsecaseModule,
 		messageProvider.DeliveryModule,
+		voiceProvider.UsecaseModule,
 		routes.Module,
 	)
 	app.Run()

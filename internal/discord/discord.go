@@ -8,7 +8,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var instance *discordSession
+var (
+	instance       *discordSession
+	voiceIsPlaying = false
+)
 
 // Discord interface
 type Discord interface {
@@ -65,4 +68,19 @@ func (ds discordSession) CloseConnection() error {
 func (ds discordSession) SendMessageToChannel(channelID string, message string) error {
 	_, err := ds.session.ChannelMessageSend(channelID, message)
 	return err
+}
+
+// VoiceStatusSwitch switch on/off voice channel
+func VoiceStatusSwitch() {
+	voiceIsPlaying = !voiceIsPlaying
+}
+
+// UpdateVoiceStatus update voice channel status
+func UpdateVoiceStatus(status bool) {
+	voiceIsPlaying = status
+}
+
+// GetVoiceStatus update voice channel status
+func GetVoiceStatus() bool {
+	return voiceIsPlaying
 }

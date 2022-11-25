@@ -8,6 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/evmartinelli/go-discordbot-panela/internal/discord"
 	messagesUsecase "github.com/evmartinelli/go-discordbot-panela/internal/messages/usecase"
+	voiceUsecase "github.com/evmartinelli/go-discordbot-panela/internal/voice/usecase"
 )
 
 // Delivery interface
@@ -16,6 +17,7 @@ type Delivery interface {
 }
 
 type messageDelivery struct {
+	voiceUsecase    voiceUsecase.Usecase
 	discord         discord.Discord
 	messagesUsecase messagesUsecase.Usecase
 }
@@ -39,7 +41,19 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 		return
 	}
 
-	if strings.Contains(m.Content, "reeday") {
+	channel, err := s.State.Channel(m.ChannelID)
+	if err != nil {
+		log.Println(err)
+	}
+	guild, err := s.State.Guild(channel.GuildID)
+	if err != nil {
+		log.Println(err)
+	}
+
+	if strings.Contains(m.Content, "ควย") || strings.Contains(m.Content, "8;p") {
+		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/kakule_malvadao.mp3", s, m, guild, false)
+		md.discord.SendMessageToChannel(m.ChannelID, "é o kakule malvadão ooo")
+	} else if strings.Contains(m.Content, "reeday") {
 		content, err := md.messagesUsecase.GetPanelaMatches()
 		if err != nil {
 			log.Println(err)
