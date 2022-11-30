@@ -71,11 +71,11 @@ func (mu messagesUsecase) GetPanelaLoss() (string, error) {
 			return "", err
 		}
 
-		matches[v.Nick] = int(stats.Matches.Loss / stats.Matches.Matches)
+		matches[v.Nick] = int(stats.Matches.Loss / stats.Matches.Matches * 100)
 
 	}
 
-	return createKeyValuePairs(SortKeys(matches), matches, "%v jogou \"%v\"\n"), nil
+	return createKeyValuePairs(SortKeys(matches), matches, "%v perdeu \"%v\"% \n"), nil
 }
 
 // GetPlayersURL return list of players
