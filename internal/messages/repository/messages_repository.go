@@ -58,8 +58,8 @@ const GCURL = "https://csgo.gamersclub.gg/api/box/history/{playerID}"
 // GetPlayersURL return list of players
 func (messageRepository) GetPlayersURL() (Players, error) {
 	// need to injection config
-	// playersFile, err := os.Open("./data/panela.json")
-	playersFile, err := os.Open("/Users/evandrom/Projects/Personal/go-discordbot-panela/data/panela.json")
+	playersFile, err := os.Open("./data/panela.json")
+	// playersFile, err := os.Open("/Users/evandrom/Projects/Personal/go-discordbot-panela/data/panela.json")
 	if err != nil {
 		log.Println("Error at HandleService: opening panela.json,\nMsg: ", err)
 		return Players{}, err
