@@ -23,23 +23,32 @@ func TestTestListPostsUseCase(t *testing.T) {
 		}
 	}
 
+	// t.Run("Given no post exists, it returns an empty slice", func(t *testing.T) {
+	// 	f := setup()
+
+	// 	player, err := f.usecase.GetPanelaMatches()
+	// 	if err != nil {
+	// 		fmt.Println(player)
+	// 	}
+	// 	fmt.Println(player)
+	// })
+
 	t.Run("Given no post exists, it returns an empty slice", func(t *testing.T) {
 		f := setup()
-
-		player, err := f.usecase.GetPanelaMatches()
-		if err != nil {
-			fmt.Println(player)
+		r := make(chan repository.Response)
+		go f.usecase.GetPanelaMatchesAsync(r)
+		for url := range r {
+			fmt.Println(url)
 		}
-		fmt.Println(player)
 	})
 
-	t.Run("Given no post exists, it returns an empty slice", func(t *testing.T) {
-		f := setup()
+	// t.Run("Given no post exists, it returns an empty slice", func(t *testing.T) {
+	// 	f := setup()
 
-		player, err := f.usecase.GetPanelaKAST()
-		if err != nil {
-			fmt.Println(player)
-		}
-		fmt.Println(player)
-	})
+	// 	player, err := f.usecase.GetPanelaKAST()
+	// 	if err != nil {
+	// 		fmt.Println(player)
+	// 	}
+	// 	fmt.Println(player)
+	// })
 }

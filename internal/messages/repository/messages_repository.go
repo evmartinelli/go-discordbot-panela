@@ -14,9 +14,9 @@ import (
 //
 //go:generate mockgen -source=messages_repository.go -destination=../mock/mock_repo.go
 type Repository interface {
-	GetBadWordList() (ReplyWordStruct, error)
 	GetPlayersURL() (Players, error)
-	GetPlayersStats(playerID string, data *Response) error
+	GetPlayerStats(playerID string, data *Response) error
+	GetPlayerStatsAsync(playerID string, rchan chan Response)
 }
 
 type messageRepository struct{}
@@ -55,28 +55,13 @@ type Response struct {
 
 const GCURL = "https://csgo.gamersclub.gg/api/box/history/{playerID}"
 
-// GetBadWordList return list of bad word
-func (messageRepository) GetBadWordList() (ReplyWordStruct, error) {
-	// need to injection config
-	messagesFile, err := os.Open("./data/messages.json")
-	if err != nil {
-		fmt.Println("Error at HandleService: opening messages.json,\nMsg: ", err)
-		return ReplyWordStruct{}, err
-	}
-	defer messagesFile.Close()
-	replyWordByteValue, _ := io.ReadAll(messagesFile)
-	var replyWord ReplyWordStruct
-	json.Unmarshal(replyWordByteValue, &replyWord)
-	return replyWord, nil
-}
-
 // GetPlayersURL return list of players
 func (messageRepository) GetPlayersURL() (Players, error) {
 	// need to injection config
 	playersFile, err := os.Open("./data/panela.json")
 	// playersFile, err := os.Open("/Users/evandrom/Projects/Personal/go-discordbot-panela/data/panela.json")
 	if err != nil {
-		log.Println("Error at HandleService: opening messages.json,\nMsg: ", err)
+		log.Println("Error at HandleService: opening panela.json,\nMsg: ", err)
 		return Players{}, err
 	}
 
@@ -91,7 +76,7 @@ func (messageRepository) GetPlayersURL() (Players, error) {
 	return players, nil
 }
 
-func (messageRepository) GetPlayersStats(playerID string, data *Response) error {
+func (messageRepository) GetPlayerStats(playerID string, data *Response) error {
 	client := resty.New()
 
 	gclubsess := "gclubsess=" + os.Getenv("GCLUB_SESS")
@@ -122,4 +107,39 @@ func (messageRepository) GetPlayersStats(playerID string, data *Response) error 
 	}
 
 	return nil
+}
+
+func (messageRepository) GetPlayerStatsAsync(playerID string, rchan chan Response) {
+	defer close(rchan)
+	client := resty.New()
+	data := &Response{}
+
+	gclubsess := "gclubsess=" + os.Getenv("GCLUB_SESS")
+
+	resp, err := client.R().
+		SetResult(data).
+		SetPathParams(map[string]string{"playerID": playerID}).
+		SetHeader("Cookie", gclubsess).
+		Get(GCURL)
+
+		// Explore response object
+	fmt.Println("Response Info:")
+	fmt.Println("  Error      :", err)
+	fmt.Println("  Status Code:", resp.StatusCode())
+	fmt.Println("  Status     :", resp.Status())
+	fmt.Println("  Proto      :", resp.Proto())
+	fmt.Println("  Time       :", resp.Time())
+	fmt.Println("  Received At:", resp.ReceivedAt())
+	fmt.Println("  Body       :\n", resp)
+	fmt.Println()
+
+	if err != nil {
+		log.Print(err)
+	}
+
+	if resp.IsError() {
+		log.Print(err)
+	}
+
+	rchan <- *data
 }
