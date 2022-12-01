@@ -154,7 +154,7 @@ func (mu messagesUsecase) GetPanelaADR() (string, error) {
 		}
 	}
 
-	return createKeyValuePairs(SortKeys(matches), matches, "%v KDR \"%v\"\n"), nil
+	return createKeyValuePairs(SortKeys(matches), matches, "%v ADR \"%v\"\n"), nil
 }
 
 func createKeyValuePairs[K constraints.Ordered, V constraints.Ordered](keys []K, m map[K]V, literal string) string {
