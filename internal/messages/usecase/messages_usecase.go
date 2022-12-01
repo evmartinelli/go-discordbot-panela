@@ -16,6 +16,7 @@ type Usecase interface {
 	GetPanelaMatches() (string, error)
 	GetPanelaMatchesAsync(rchan chan repository.Response)
 	GetPanelaKAST() (string, error)
+	GetPanelaADR() (string, error)
 	GetPanelaLoss() (string, error)
 }
 
@@ -128,6 +129,32 @@ func (mu messagesUsecase) GetPanelaKAST() (string, error) {
 	}
 
 	return createKeyValuePairs(SortKeys(matches), matches, "%v KAST \"%v\"\n"), nil
+}
+
+func (mu messagesUsecase) GetPanelaADR() (string, error) {
+	defer timeTrack(time.Now(), "ADR")
+	matches := make(map[string]string)
+
+	players, err := mu.messagesRepository.GetPlayersURL()
+	if err != nil {
+		return "", err
+	}
+
+	for _, v := range players.Players {
+		var stats repository.Response
+		err = mu.messagesRepository.GetPlayerStats(v.Url, &stats)
+		if err != nil {
+			return "", err
+		}
+
+		for _, stat := range stats.Stat {
+			if stat.Stat == "ADR" {
+				matches[v.Nick] = stat.Value
+			}
+		}
+	}
+
+	return createKeyValuePairs(SortKeys(matches), matches, "%v KDR \"%v\"\n"), nil
 }
 
 func createKeyValuePairs[K constraints.Ordered, V constraints.Ordered](keys []K, m map[K]V, literal string) string {
