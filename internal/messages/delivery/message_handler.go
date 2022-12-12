@@ -57,7 +57,6 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 	} else if strings.Contains(m.Content, "terra") {
 		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/terra_alben.mp3", s, m, guild, false)
 		md.discord.SendMessageToChannel(m.ChannelID, "era só ouvir o doutor...")
-	} else if strings.Contains(m.Content, "tr") {
 	} else if strings.Contains(m.Content, "corno") {
 		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/corno_detectado.mpeg", s, m, guild, false)
 		md.discord.SendMessageToChannel(m.ChannelID, "e é VOCÊ...")
