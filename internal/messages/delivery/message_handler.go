@@ -72,6 +72,18 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 	} else if strings.Contains(m.Content, "feliz") {
 		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/proibido_ser_feliz.mp4", s, m, guild, false)
 		md.discord.SendMessageToChannel(m.ChannelID, "proibido ser feliz...")
+	} else if strings.Contains(m.Content, "pegando") {
+		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/pegando.mp4", s, m, guild, false)
+		md.discord.SendMessageToChannel(m.ChannelID, "eu to pegando uns cara...")
+	} else if strings.Contains(m.Content, "horroroso") {
+		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/horroroso.mp4", s, m, guild, false)
+		md.discord.SendMessageToChannel(m.ChannelID, "fale por vc...")
+	} else if strings.Contains(m.Content, "bosta") {
+		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/seubosta.mp4", s, m, guild, false)
+		md.discord.SendMessageToChannel(m.ChannelID, "SEU B#$#$...")
+	} else if strings.Contains(m.Content, "panela") {
+		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/panela.mp4", s, m, guild, false)
+		md.discord.SendMessageToChannel(m.ChannelID, "é sim...")
 	} else if strings.Contains(m.Content, "reeday") {
 		content, err := md.messagesUsecase.GetPanelaMatches()
 		if err != nil {
