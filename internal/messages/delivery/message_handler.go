@@ -84,6 +84,9 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 	} else if strings.Contains(m.Content, "panela") {
 		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/panela.mp4", s, m, guild, false)
 		md.discord.SendMessageToChannel(m.ChannelID, "é sim...")
+	} else if strings.Contains(m.Content, "testcms") {
+		go md.voiceUsecase.JoiAndPlayAudioFile("https://pub-31421060051a4b90b63207767964aab4.r2.dev/panelabot-cms/production/media/audio-80e48d57374b8de3f0d99ee438e992a4.mp3", s, m, guild, false)
+		md.discord.SendMessageToChannel(m.ChannelID, "é sim...")
 	} else if strings.Contains(m.Content, "reeday") {
 		content, err := md.messagesUsecase.GetPanelaMatches()
 		if err != nil {
