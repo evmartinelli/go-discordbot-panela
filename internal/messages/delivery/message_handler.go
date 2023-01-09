@@ -89,11 +89,15 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 		md.discord.SendMessageToChannel(m.ChannelID, "é sim...")
 	} else if strings.Contains(m.Content, "testcms") {
 		fileUrl := "https://pub-31421060051a4b90b63207767964aab4.r2.dev/panelabot-cms/production/media/audio-80e48d57374b8de3f0d99ee438e992a4.mp3"
-		err := DownloadFile("teste.mp3", fileUrl)
-		if err != nil {
-			panic(err)
+		if _, err := os.Stat("teste.mp3"); err == nil {
+			fmt.Printf("File exists\n")
+		} else {
+			err := DownloadFile("teste.mp3", fileUrl)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("Downloaded: " + fileUrl)
 		}
-		fmt.Println("Downloaded: " + fileUrl)
 		go md.voiceUsecase.JoiAndPlayAudioFile("teste.mp3", s, m, guild, false)
 		md.discord.SendMessageToChannel(m.ChannelID, "é sim...")
 	} else if strings.Contains(m.Content, "reeday") {
