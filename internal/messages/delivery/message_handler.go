@@ -94,7 +94,7 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 			panic(err)
 		}
 		fmt.Println("Downloaded: " + fileUrl)
-		go md.voiceUsecase.JoiAndPlayAudioFile(fileUrl, s, m, guild, false)
+		go md.voiceUsecase.JoiAndPlayAudioFile("teste.mp3", s, m, guild, false)
 		md.discord.SendMessageToChannel(m.ChannelID, "é sim...")
 	} else if strings.Contains(m.Content, "reeday") {
 		content, err := md.messagesUsecase.GetPanelaMatches()
