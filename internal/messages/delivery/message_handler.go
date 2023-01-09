@@ -1,7 +1,10 @@
 package delivery
 
 import (
+	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -85,7 +88,13 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 		go md.voiceUsecase.JoiAndPlayAudioFile("./sound/panela.mp4", s, m, guild, false)
 		md.discord.SendMessageToChannel(m.ChannelID, "é sim...")
 	} else if strings.Contains(m.Content, "testcms") {
-		go md.voiceUsecase.JoiAndPlayAudioFile("https://pub-31421060051a4b90b63207767964aab4.r2.dev/panelabot-cms/production/media/audio-80e48d57374b8de3f0d99ee438e992a4.mp3", s, m, guild, false)
+		fileUrl := "https://pub-31421060051a4b90b63207767964aab4.r2.dev/panelabot-cms/production/media/audio-80e48d57374b8de3f0d99ee438e992a4.mp3"
+		err := DownloadFile("teste.mp3", fileUrl)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Downloaded: " + fileUrl)
+		go md.voiceUsecase.JoiAndPlayAudioFile(fileUrl, s, m, guild, false)
 		md.discord.SendMessageToChannel(m.ChannelID, "é sim...")
 	} else if strings.Contains(m.Content, "reeday") {
 		content, err := md.messagesUsecase.GetPanelaMatches()
@@ -112,4 +121,24 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 		}
 		md.discord.SendMessageToChannel(m.ChannelID, content)
 	}
+}
+
+func DownloadFile(filepath string, url string) error {
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	return err
 }
