@@ -13,7 +13,7 @@ var stopChannel chan bool
 // Usecase interface
 type Usecase interface {
 	PlayAudioFile(string, *discordgo.VoiceConnection)
-	JoiAndPlayAudioFile(string, *discordgo.Session, *discordgo.MessageCreate, *discordgo.Guild, bool)
+	JoinAndPlayAudioFile(string, *discordgo.Session, *discordgo.MessageCreate, *discordgo.Guild, bool)
 	ConnectToVoiceChannel(*discordgo.Session, *discordgo.MessageCreate, *discordgo.Guild, bool) (*discordgo.VoiceConnection, error)
 	StopVoice()
 }
@@ -47,8 +47,8 @@ func (voiceUsecase) PlayAudioFile(file string, voiceConnection *discordgo.VoiceC
 	}
 }
 
-// JoiAndPlayAudioFile return youtube download url
-func (vu voiceUsecase) JoiAndPlayAudioFile(file string, s *discordgo.Session, m *discordgo.MessageCreate, guild *discordgo.Guild, isMusicPlaying bool) {
+// JoinAndPlayAudioFile return youtube download url
+func (vu voiceUsecase) JoinAndPlayAudioFile(file string, s *discordgo.Session, m *discordgo.MessageCreate, guild *discordgo.Guild, isMusicPlaying bool) {
 	voiceConnection, err := connectToVoiceChannel(vu.discord, s, m, guild, isMusicPlaying)
 	if err != nil {
 		log.Printf("Error: connect to voice channel, Message: '%s'", err)
