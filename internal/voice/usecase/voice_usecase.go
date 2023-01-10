@@ -1,11 +1,17 @@
 package usecase
 
 import (
+	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/bwmarrin/dgvoice"
 	"github.com/bwmarrin/discordgo"
 	"github.com/evmartinelli/go-discordbot-panela/internal/discord"
+	"github.com/evmartinelli/go-discordbot-panela/internal/messages/repository"
 )
 
 var stopChannel chan bool
@@ -19,13 +25,14 @@ type Usecase interface {
 }
 
 type voiceUsecase struct {
-	discord discord.Discord
+	discord            discord.Discord
+	messagesRepository repository.Repository
 }
 
 // NewVoiceUsecase new voice usecase
-func NewVoiceUsecase(discord discord.Discord) Usecase {
+func NewVoiceUsecase(mr repository.Repository) Usecase {
 	return &voiceUsecase{
-		discord: discord,
+		messagesRepository: mr,
 	}
 }
 
@@ -48,17 +55,36 @@ func (voiceUsecase) PlayAudioFile(file string, voiceConnection *discordgo.VoiceC
 }
 
 // JoinAndPlayAudioFile return youtube download url
-func (vu voiceUsecase) JoinAndPlayAudioFile(file string, s *discordgo.Session, m *discordgo.MessageCreate, guild *discordgo.Guild, isMusicPlaying bool) {
+func (vu voiceUsecase) JoinAndPlayAudioFile(content string, s *discordgo.Session, m *discordgo.MessageCreate, guild *discordgo.Guild, isMusicPlaying bool) {
 	voiceConnection, err := connectToVoiceChannel(vu.discord, s, m, guild, isMusicPlaying)
 	if err != nil {
 		log.Printf("Error: connect to voice channel, Message: '%s'", err)
 	}
-	if !discord.GetVoiceStatus() {
-		stopChannel = make(chan bool)
-		discord.UpdateVoiceStatus(true)
-		dgvoice.PlayAudioFile(voiceConnection, file, stopChannel)
-		close(stopChannel)
-		discord.UpdateVoiceStatus(false)
+	data, err := vu.messagesRepository.GetAudioItems()
+	if err != nil {
+		log.Printf("Error: connect to voice channel, Message: '%s'", err)
+	}
+
+	for _, v := range data.Items {
+		if v.Title == content {
+			if _, err := filenameUsed(v.Title); err == nil {
+				fmt.Printf("File exists\n")
+			} else {
+				ext := filepath.Ext(v.Attachments[0].Url)
+				err := DownloadFile(v.Title+ext, v.Attachments[0].Url)
+				if err != nil {
+					panic(err)
+				}
+				fmt.Println("Downloaded: " + v.Attachments[0].Url)
+			}
+			if !discord.GetVoiceStatus() {
+				stopChannel = make(chan bool)
+				discord.UpdateVoiceStatus(true)
+				dgvoice.PlayAudioFile(voiceConnection, v.Title, stopChannel)
+				close(stopChannel)
+				discord.UpdateVoiceStatus(false)
+			}
+		}
 	}
 }
 
@@ -89,4 +115,32 @@ func connectToVoiceChannel(discord discord.Discord, s *discordgo.Session, m *dis
 		return nil, err
 	}
 	return
+}
+
+func DownloadFile(filepath string, url string) error {
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	return err
+}
+
+func filenameUsed(name string) (bool, error) {
+	matches, err := filepath.Glob(name + ".*")
+	if err != nil {
+		return false, err
+	}
+	return len(matches) > 0, nil
 }

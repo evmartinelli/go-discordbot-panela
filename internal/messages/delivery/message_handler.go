@@ -1,10 +1,7 @@
 package delivery
 
 import (
-	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 
@@ -53,59 +50,8 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 	if err != nil {
 		log.Println(err)
 	}
-
-	if strings.Contains(m.Content, "malvadao") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/kakule_malvadao.mp3", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "é o kakule malvadão ooo")
-	} else if strings.Contains(m.Content, "terra") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/terra_alben.mp3", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "era só ouvir o doutor...")
-	} else if strings.Contains(m.Content, "corno") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/corno_detectado.mpeg", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "e é VOCÊ...")
-	} else if strings.Contains(m.Content, "tr") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/encaixou_tr.mp3", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "encaixooou esse tr ai hein...")
-	} else if strings.Contains(m.Content, "ct") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/encaixou_ct.mp3", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "encaixooou esse ct ai hein...")
-	} else if strings.Contains(m.Content, "carita") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/bota_la_carita.mp4", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "ai botou...")
-	} else if strings.Contains(m.Content, "feliz") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/proibido_ser_feliz.mp4", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "proibido ser feliz...")
-	} else if strings.Contains(m.Content, "pegando") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/pegando.mp4", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "eu to pegando uns cara...")
-	} else if strings.Contains(m.Content, "horroroso") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/horroroso.mp4", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "fale por vc...")
-	} else if strings.Contains(m.Content, "bosta") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/seubosta.mp4", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "SEU B#$#$...")
-	} else if strings.Contains(m.Content, "panela") {
-		go md.voiceUsecase.JoinAndPlayAudioFile("./sound/panela.mp4", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "é sim...")
-	} else if strings.Contains(m.Content, "testcms") {
-		fileUrl := "https://pub-31421060051a4b90b63207767964aab4.r2.dev/panelabot-cms/production/media/audio-80e48d57374b8de3f0d99ee438e992a4.mp3"
-		if _, err := os.Stat("teste.mp3"); err == nil {
-			fmt.Printf("File exists\n")
-		} else {
-			err := DownloadFile("teste.mp3", fileUrl)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println("Downloaded: " + fileUrl)
-		}
-		go md.voiceUsecase.JoinAndPlayAudioFile("teste.mp3", s, m, guild, false)
-		md.discord.SendMessageToChannel(m.ChannelID, "é sim...")
-	} else if strings.Contains(m.Content, "reeday") {
-		content, err := md.messagesUsecase.GetPanelaMatches()
-		if err != nil {
-			log.Println(err)
-		}
-		md.discord.SendMessageToChannel(m.ChannelID, content)
+	if m.Content != "" {
+		go md.voiceUsecase.JoinAndPlayAudioFile(m.Content, s, m, guild, false)
 	} else if strings.Contains(m.Content, "dumb") {
 		content, err := md.messagesUsecase.GetPanelaLoss()
 		if err != nil {
@@ -125,24 +71,4 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 		}
 		md.discord.SendMessageToChannel(m.ChannelID, content)
 	}
-}
-
-func DownloadFile(filepath string, url string) error {
-	// Get the data
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	// Create the file
-	out, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	// Write the body to file
-	_, err = io.Copy(out, resp.Body)
-	return err
 }

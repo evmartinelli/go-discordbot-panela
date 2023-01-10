@@ -17,6 +17,7 @@ type Repository interface {
 	GetPlayersURL() (Players, error)
 	GetPlayerStats(playerID string, data *Response) error
 	GetPlayerStatsAsync(playerID string, rchan chan Response)
+	GetAudioItems() (*ResponseCMS, error)
 }
 
 type messageRepository struct{}
@@ -53,13 +54,24 @@ type Response struct {
 	} `json:"stat"`
 }
 
-const GCURL = "https://csgo.gamersclub.gg/api/box/history/{playerID}"
+type ResponseCMS struct {
+	Items []struct {
+		Title       string `json:"title"`
+		Attachments []struct {
+			Url string `json:"url"`
+		} `json:"attachments"`
+	} `json:"items"`
+}
+
+const (
+	GCURL  = "https://csgo.gamersclub.gg/api/box/history/{playerID}"
+	CMSURL = "https://panelabot.win/json/"
+)
 
 // GetPlayersURL return list of players
 func (messageRepository) GetPlayersURL() (Players, error) {
 	// need to injection config
 	playersFile, err := os.Open("./data/panela.json")
-	// playersFile, err := os.Open("/Users/evandrom/Projects/Personal/go-discordbot-panela/data/panela.json")
 	if err != nil {
 		log.Println("Error at HandleService: opening panela.json,\nMsg: ", err)
 		return Players{}, err
@@ -142,4 +154,22 @@ func (messageRepository) GetPlayerStatsAsync(playerID string, rchan chan Respons
 	}
 
 	rchan <- *data
+}
+
+func (messageRepository) GetAudioItems() (*ResponseCMS, error) {
+	client := resty.New()
+	data := &ResponseCMS{}
+	resp, err := client.R().
+		SetResult(data).
+		Get(CMSURL)
+	if err != nil {
+		return &ResponseCMS{}, fmt.Errorf("TranslationWebAPI - Translate - trans.Translate: %w", err)
+	}
+
+	if resp.IsError() {
+		return &ResponseCMS{}, fmt.Errorf("TranslationWebAPI - Translate - trans.Translate: %w", err)
+	}
+	fmt.Println("  Body       :\n", resp)
+
+	return data, nil
 }
