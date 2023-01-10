@@ -58,10 +58,6 @@ func (voiceUsecase) PlayAudioFile(file string, voiceConnection *discordgo.VoiceC
 
 // JoinAndPlayAudioFile return youtube download url
 func (vu voiceUsecase) JoinAndPlayAudioFile(content string, s *discordgo.Session, m *discordgo.MessageCreate, guild *discordgo.Guild, isMusicPlaying bool) {
-	voiceConnection, err := connectToVoiceChannel(vu.discord, s, m, guild, isMusicPlaying)
-	if err != nil {
-		log.Printf("Error: connect to voice channel, Message: '%s'", err)
-	}
 	data, err := vu.messagesRepository.GetAudioItems()
 	if err != nil {
 		log.Printf("Error: connect to voice channel, Message: '%s'", err)
@@ -69,20 +65,33 @@ func (vu voiceUsecase) JoinAndPlayAudioFile(content string, s *discordgo.Session
 
 	for _, v := range data.Items {
 		if strings.Contains(content, v.Title) {
-			ext := filepath.Ext(v.Attachments[0].Url)
-			if _, err := filenameUsed(v.Title); err == nil {
+			fileToPlay := v.Title + filepath.Ext(v.Attachments[0].Url)
+			if _, err := os.Stat(fileToPlay); err == nil {
 				fmt.Printf("File exists\n")
 			} else {
-				err := DownloadFile(v.Title+ext, v.Attachments[0].Url)
+				err := DownloadFile(fileToPlay, v.Attachments[0].Url)
 				if err != nil {
 					panic(err)
 				}
 				fmt.Println("Downloaded: " + v.Attachments[0].Url)
 			}
+			// if _, err := filenameUsed(v.Title); err == nil {
+			// 	fmt.Printf("File exists\n")
+			// } else {
+			// 	err := DownloadFile(v.Title+ext, v.Attachments[0].Url)
+			// 	if err != nil {
+			// 		panic(err)
+			// 	}
+			// 	fmt.Println("Downloaded: " + v.Attachments[0].Url)
+			// }
+			voiceConnection, err := connectToVoiceChannel(vu.discord, s, m, guild, isMusicPlaying)
+			if err != nil {
+				log.Printf("Error: connect to voice channel, Message: '%s'", err)
+			}
 			if !discord.GetVoiceStatus() {
 				stopChannel = make(chan bool)
 				discord.UpdateVoiceStatus(true)
-				dgvoice.PlayAudioFile(voiceConnection, v.Title+ext, stopChannel)
+				dgvoice.PlayAudioFile(voiceConnection, fileToPlay, stopChannel)
 				close(stopChannel)
 				discord.UpdateVoiceStatus(false)
 			}
