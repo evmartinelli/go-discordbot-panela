@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bwmarrin/dgvoice"
 	"github.com/bwmarrin/discordgo"
@@ -67,11 +68,11 @@ func (vu voiceUsecase) JoinAndPlayAudioFile(content string, s *discordgo.Session
 	}
 
 	for _, v := range data.Items {
-		if v.Title == content {
+		if strings.Contains(content, v.Title) {
+			ext := filepath.Ext(v.Attachments[0].Url)
 			if _, err := filenameUsed(v.Title); err == nil {
 				fmt.Printf("File exists\n")
 			} else {
-				ext := filepath.Ext(v.Attachments[0].Url)
 				err := DownloadFile(v.Title+ext, v.Attachments[0].Url)
 				if err != nil {
 					panic(err)
@@ -81,7 +82,7 @@ func (vu voiceUsecase) JoinAndPlayAudioFile(content string, s *discordgo.Session
 			if !discord.GetVoiceStatus() {
 				stopChannel = make(chan bool)
 				discord.UpdateVoiceStatus(true)
-				dgvoice.PlayAudioFile(voiceConnection, v.Title, stopChannel)
+				dgvoice.PlayAudioFile(voiceConnection, v.Title+ext, stopChannel)
 				close(stopChannel)
 				discord.UpdateVoiceStatus(false)
 			}
@@ -96,8 +97,8 @@ func (vu voiceUsecase) ConnectToVoiceChannel(s *discordgo.Session, m *discordgo.
 
 func (vu voiceUsecase) VoiceCommands() *repository.ResponseCMS {
 	data, err := vu.messagesRepository.GetAudioItems()
-	if err == nil {
-		panic("erro")
+	if err != nil {
+		fmt.Print("error getting itens")
 	}
 
 	return data

@@ -77,7 +77,7 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 
 func contains(s *repository.ResponseCMS, str string) bool {
 	for _, v := range s.Items {
-		if v.Title == str {
+		if strings.HasSuffix(str, v.Title) {
 			return true
 		}
 	}
