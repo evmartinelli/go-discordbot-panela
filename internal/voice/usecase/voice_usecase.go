@@ -22,6 +22,7 @@ type Usecase interface {
 	JoinAndPlayAudioFile(string, *discordgo.Session, *discordgo.MessageCreate, *discordgo.Guild, bool)
 	ConnectToVoiceChannel(*discordgo.Session, *discordgo.MessageCreate, *discordgo.Guild, bool) (*discordgo.VoiceConnection, error)
 	StopVoice()
+	VoiceCommands() *repository.ResponseCMS
 }
 
 type voiceUsecase struct {
@@ -91,6 +92,15 @@ func (vu voiceUsecase) JoinAndPlayAudioFile(content string, s *discordgo.Session
 // ConnectToVoiceChannel connect to user voice channelId
 func (vu voiceUsecase) ConnectToVoiceChannel(s *discordgo.Session, m *discordgo.MessageCreate, guild *discordgo.Guild, isMusicPlaying bool) (*discordgo.VoiceConnection, error) {
 	return connectToVoiceChannel(vu.discord, s, m, guild, isMusicPlaying)
+}
+
+func (vu voiceUsecase) VoiceCommands() *repository.ResponseCMS {
+	data, err := vu.messagesRepository.GetAudioItems()
+	if err == nil {
+		panic("erro")
+	}
+
+	return data
 }
 
 func findVoiceChannelID(guild *discordgo.Guild, m *discordgo.MessageCreate) string {

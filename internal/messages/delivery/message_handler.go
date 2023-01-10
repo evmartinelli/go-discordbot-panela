@@ -7,6 +7,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/evmartinelli/go-discordbot-panela/internal/discord"
+	"github.com/evmartinelli/go-discordbot-panela/internal/messages/repository"
 	messagesUsecase "github.com/evmartinelli/go-discordbot-panela/internal/messages/usecase"
 	voiceUsecase "github.com/evmartinelli/go-discordbot-panela/internal/voice/usecase"
 )
@@ -50,7 +51,8 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 	if err != nil {
 		log.Println(err)
 	}
-	if m.Content != "" {
+
+	if contains(md.voiceUsecase.VoiceCommands(), m.Content) {
 		go md.voiceUsecase.JoinAndPlayAudioFile(m.Content, s, m, guild, false)
 	} else if strings.Contains(m.Content, "dumb") {
 		content, err := md.messagesUsecase.GetPanelaLoss()
@@ -71,4 +73,14 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 		}
 		md.discord.SendMessageToChannel(m.ChannelID, content)
 	}
+}
+
+func contains(s *repository.ResponseCMS, str string) bool {
+	for _, v := range s.Items {
+		if v.Title == str {
+			return true
+		}
+	}
+
+	return false
 }
