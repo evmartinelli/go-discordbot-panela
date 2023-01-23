@@ -54,6 +54,12 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 
 	if contains(md.voiceUsecase.VoiceCommands(), m.Content) {
 		go md.voiceUsecase.JoinAndPlayAudioFile(m.Content, s, m, guild, false)
+	} else if strings.Contains(m.Content, "reeday") {
+		content, err := md.messagesUsecase.GetPanelaMatches()
+		if err != nil {
+			log.Println(err)
+		}
+		md.discord.SendMessageToChannel(m.ChannelID, content)
 	} else if strings.Contains(m.Content, "dumb") {
 		content, err := md.messagesUsecase.GetPanelaLoss()
 		if err != nil {
