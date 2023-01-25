@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"bytes"
 	"log"
 	"os"
 	"strings"
@@ -54,6 +55,14 @@ func (md messageDelivery) GetMessageHandler(s *discordgo.Session, m *discordgo.M
 
 	if contains(md.voiceUsecase.VoiceCommands(), m.Content) {
 		go md.voiceUsecase.JoinAndPlayAudioFile(m.Content, s, m, guild, false)
+	} else if strings.Contains(m.Content, "ajuda") {
+		content := md.voiceUsecase.VoiceCommands()
+		var b bytes.Buffer
+		for _, v := range content.Items {
+			b.WriteString(v.Title)
+			b.WriteString("\n")
+		}
+		md.discord.SendMessageToChannel(m.ChannelID, b.String())
 	} else if strings.Contains(m.Content, "reeday") {
 		content, err := md.messagesUsecase.GetPanelaMatches()
 		if err != nil {
