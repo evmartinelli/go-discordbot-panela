@@ -1,22 +1,24 @@
 # Step 1: Modules caching
-FROM golang:1.20.2-alpine3.17 as modules
-COPY go.mod go.sum /modules/
-WORKDIR /modules
+FROM golang:1.20.2-alpine3.17 as build
+
+WORKDIR /app
+COPY go.mod  ./
+COPY go.sum  ./
+
 RUN go mod download
+
+COPY *.go ./
+
+RUN go build -o /bin/app
+
+
 
 # Step 2: Builder
 FROM golang:1.20.2-alpine3.17 as builder
-COPY --from=modules /go/pkg /go/pkg
-COPY . /app
-WORKDIR /app
-RUN go build -o /bin/app ./cmd/app
+WORKDIR /
 
-# Step 3: Final
-FROM scratch
-COPY --from=builder /app/data /data
-COPY --from=builder /bin/app /app
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-
-CMD ["/app"]
+COPY --from=build /bin/app /bin/app
 
 EXPOSE 8080
+
+ENTRYPOINT ["/bin/app"]
